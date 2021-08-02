@@ -5,22 +5,30 @@ import {
   Text,
   TextInput,
   View,
-  NativeSyntheticEvent,
-  TextInputChangeEventData,
+  Button,
+  ScrollView,
 } from "react-native";
 
-import { Asset, useAssets } from "expo-asset";
+import { Asset } from "expo-asset";
 import PickerWrapper from "./components/PickerWrapper";
 // import * as FileSystem from "expo-file-system";
 const numOfBedrooms: string[] = ["0", "1", "2", "3", "4", "5", "6", "7"];
 const numOfBathrooms: string[] = ["0", "1", "2", "3", "4", "5", "6", "7"];
 
 export default function App() {
+  // Picker States
   const [selectedNumBedrooms, setSelectedNumBedrooms] = useState("");
   const [selectedNumBathrooms, setSelectedNumBathrooms] = useState("");
   const [selectedListingType, setSelectedListingType] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
 
+  // state to store and render text fetched from txt files
+  const [location, setLocation] = useState<string[]>([]);
   const [listingType, setListingType] = useState<string[]>([]);
+
+  // textinnput state
+  const [number, onChangeNumber] = useState("");
+  const [description, setDescription] = useState("");
   // TextInput things..
   // const [text, setText] = useState("");
 
@@ -31,62 +39,49 @@ export default function App() {
   //   setText(value);
   // };
 
-  // async function fetchText(file_path: string) {
-  //   const item = Asset.fromModule(require(file_path));
-  //   let text;
-  //   try {
-  //     let textresponse = await fetch(item.uri);
-  //     text = await textresponse.text();
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  //   return text;
-  // }
-  // useEffect(() => {
-  //   fetchText("./assets/textfiles/listing_type.txt");
-  // }, []);
-
+  const handleSubmit = (pressEvent) => {
+    //
+  };
+  const text_files = {
+    listing_type: require("./assets/textfiles/listing_type.txt"),
+    location: require("./assets/textfiles/location.txt"),
+  };
+  // TODO: could be changed to a reducer
   const addArrayItemsToState = (arrayItems: string[], state: string) => {
     switch (state) {
       case "listingType":
         setListingType([...listingType, ...arrayItems]);
         break;
 
+      case "location":
+        setLocation([...location, ...arrayItems]);
+        break;
       default:
         break;
     }
   };
-  async function fetchText() {
-    const item = Asset.fromModule(
-      require("./assets/textfiles/listing_type.txt")
-    );
+  async function fetchText(require_module: any) {
+    const item = Asset.fromModule(require_module);
     let textresponse = await fetch(item.uri);
     let text = await textresponse.text();
 
     let textArray = text.split("\n");
-    addArrayItemsToState(textArray, "listingType");
+    return textArray;
   }
   useEffect(() => {
-    fetchText();
+    const listing_type_textArray = fetchText(text_files.listing_type);
+    listing_type_textArray.then((listing_type_textArray) => {
+      addArrayItemsToState(listing_type_textArray, "listingType");
+    });
+
+    const location_textArray = fetchText(text_files.location);
+    location_textArray.then((location_textArray) =>
+      addArrayItemsToState(location_textArray, "location")
+    );
   }, []);
 
-  // readListingTypeContent();
-  // listing type
-  //   TODO: output unique listing types to a file
-  //         read them into the app and display into dropdown list
-  // bedrooms - done
-  // bathrooms - done
-  // area
-  //   TODO: let the user input their number?? or we can set a max and min according to our data model
-  // price
-  //    TODO: just let them input their number? I guess
-  // location
-  //   TODO: output unique locations to a file
-  //         read them into the app and display into dropdown list
-  // description
-  //    TODO: find large textinput , will see
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text>Number of bedrooms: </Text>
 
       <PickerWrapper
@@ -100,13 +95,39 @@ export default function App() {
         selectedPickerItem={selectedNumBedrooms}
         setSelectedPicketItem={setSelectedNumBedrooms}
       />
+      <Text> listing type: </Text>
       <PickerWrapper
         pickerItems={listingType}
         selectedPickerItem={selectedListingType}
         setSelectedPicketItem={setSelectedListingType}
       />
+      <Text> Area (sqft): </Text>
+      <TextInput
+        style={styles.textinput}
+        onChangeText={onChangeNumber}
+        value={number}
+        keyboardType="numeric"
+      />
+      <Text> Location: </Text>
+
+      <PickerWrapper
+        pickerItems={location}
+        selectedPickerItem={selectedLocation}
+        setSelectedPicketItem={setSelectedLocation}
+      />
+      <Text> Description</Text>
+
+      <TextInput
+        style={styles.multilineTextInput}
+        multiline
+        numberOfLines={16}
+        onChangeText={setDescription}
+        value={description}
+      />
       <StatusBar style="auto" />
-    </View>
+
+      <Button title="Submit" onPress={handleSubmit} />
+    </ScrollView>
   );
 }
 
@@ -120,10 +141,13 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
   },
   textinput: {
-    height: 60,
+    height: 40,
     backgroundColor: "#ededed",
     width: 100,
     padding: 10,
+  },
+  multilineTextInput: {
+    backgroundColor: "#ededed",
   },
   picker: {
     width: 200,
