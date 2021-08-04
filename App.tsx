@@ -16,6 +16,7 @@ const numOfBedrooms: string[] = ["0", "1", "2", "3", "4", "5", "6", "7"];
 const numOfBathrooms: string[] = ["0", "1", "2", "3", "4", "5", "6", "7"];
 
 export default function App() {
+  const SERVER_URL = "http://127.0.0.1:5000/";
   // Picker States
   const [selectedNumBedrooms, setSelectedNumBedrooms] = useState("");
   const [selectedNumBathrooms, setSelectedNumBathrooms] = useState("");
@@ -27,7 +28,7 @@ export default function App() {
   const [listingType, setListingType] = useState<string[]>([]);
 
   // textinnput state
-  const [number, onChangeNumber] = useState("");
+  const [area, onChangeArea] = useState("");
   const [description, setDescription] = useState("");
   // TextInput things..
   // const [text, setText] = useState("");
@@ -39,13 +40,32 @@ export default function App() {
   //   setText(value);
   // };
 
-  const handleSubmit = (pressEvent) => {
+  const handleSubmit = async (pressEvent) => {
     //
+    let res = await fetch(SERVER_URL, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        bedrooms: selectedNumBedrooms,
+        bathrooms: selectedNumBathrooms,
+        area: area,
+        location: selectedLocation,
+        listing_type: selectedListingType,
+        description: description,
+      }),
+    });
+    let price = await res.json();
+    let priceText = price.price;
+    console.log("price is: ", priceText);
   };
   const text_files = {
     listing_type: require("./assets/textfiles/listing_type.txt"),
     location: require("./assets/textfiles/location.txt"),
   };
+
   // TODO: could be changed to a reducer
   const addArrayItemsToState = (arrayItems: string[], state: string) => {
     switch (state) {
@@ -104,8 +124,8 @@ export default function App() {
       <Text> Area (sqft): </Text>
       <TextInput
         style={styles.textinput}
-        onChangeText={onChangeNumber}
-        value={number}
+        onChangeText={onChangeArea}
+        value={area}
         keyboardType="numeric"
       />
       <Text> Location: </Text>
