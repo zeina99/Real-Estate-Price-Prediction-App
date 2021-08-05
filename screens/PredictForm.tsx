@@ -13,7 +13,7 @@ import {
 import RNPickerSelect from "react-native-picker-select";
 import { fetchPrice } from "../api/price";
 import { fetchText } from "../api/text";
-import { log } from "react-native-reanimated";
+import { convertArraytoArrayOfObjects } from "../utils/arrays";
 
 // import * as FileSystem from "expo-file-system";
 const numOfBedrooms = [
@@ -78,8 +78,8 @@ export default function PredictForm({ navigation, price, setPrice }) {
       console.log(
         selectedNumBedrooms,
         selectedNumBathrooms,
-        area,
         selectedListingType,
+        area,
         selectedLocation,
         description
       );
@@ -109,13 +109,6 @@ export default function PredictForm({ navigation, price, setPrice }) {
     }
   };
 
-  const convertArraytoArrayOfObjects = (array: string[]) => {
-    let arrayOfObjects = array.map((arrayItem) => {
-      return { label: arrayItem, value: arrayItem };
-    });
-
-    return arrayOfObjects;
-  };
   // useeffect(() => {
   //   const listing_type_textarray = fetchtext(text_files.listing_type);
   //   listing_type_textarray.then((listing_type_textarray) => {
