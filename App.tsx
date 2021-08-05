@@ -42,7 +42,7 @@ const text_files = {
 };
 
 export default function App() {
-  // Picker States
+  // Picker selected value States
   const [selectedNumBedrooms, setSelectedNumBedrooms] = useState("");
   const [selectedNumBathrooms, setSelectedNumBathrooms] = useState("");
   const [selectedListingType, setSelectedListingType] = useState("");
