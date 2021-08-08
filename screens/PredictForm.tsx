@@ -44,11 +44,29 @@ const text_files = {
 };
 
 export default function PredictForm({ navigation, price, setPrice }) {
+  // error message states
+
+  // const [locationError, setLocationError] = useState("");
+  // const [bedroomsError, setBedroomsError] = useState("");
+  // const [bathroomsError, setBathroomsError] = useState("");
+  // const [listingTypeError, setListingTypeError] = useState("");
+  // const [areaError, setAreaError] = useState<number>();
+  // const [descriptionError, setDescriptionError] = useState("");
+
+  const [errors, setErrors] = useState<{
+    location?: string;
+    listingType?: string;
+    bathrooms?: string;
+    bedrooms?: string;
+    area?: string;
+    description?: string;
+  }>({});
+  const [requestedSubmit, setRequestedSubmit] = useState(false);
   // Picker selected value States
-  const [selectedNumBedrooms, setSelectedNumBedrooms] = useState("");
-  const [selectedNumBathrooms, setSelectedNumBathrooms] = useState("");
-  const [selectedListingType, setSelectedListingType] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedNumBedrooms, setSelectedNumBedrooms] = useState(null);
+  const [selectedNumBathrooms, setSelectedNumBathrooms] = useState(null);
+  const [selectedListingType, setSelectedListingType] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
   // state to store and render text fetched from txt files
   const [location, setLocation] = useState<{ label: string; value: string }[]>(
@@ -62,8 +80,52 @@ export default function PredictForm({ navigation, price, setPrice }) {
   const [area, onChangeArea] = useState("");
   const [description, setDescription] = useState("");
 
-  const handleSubmit = async () => {
+  const validateInputs = () => {
+    let errors: {
+      location?: string;
+      listingType?: string;
+      bathrooms?: string;
+      bedrooms?: string;
+      area?: string;
+      description?: string;
+    } = {};
+
+    if (selectedLocation === null) {
+      errors.location = "location has to be selected";
+    }
+
+    if (selectedListingType === null) {
+      errors.listingType = "listing type has to be selected";
+    }
+
+    if (selectedNumBathrooms === null) {
+      errors.bathrooms = "number of bathrooms has to be selected";
+    }
+
+    if (selectedNumBedrooms === null) {
+      errors.bedrooms = "number of bedrooms has to be selected";
+    }
+
+    if (area === "") {
+      errors.area = "area cannot be empty";
+    }
+
+    if (description === "") {
+      errors.description = "description cannot be empty";
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = () => {
+    let errors = validateInputs();
+    setErrors(errors);
+    setRequestedSubmit(true);
+  };
+
+  const submitRequest = async () => {
     let price;
+
     try {
       price = await fetchPrice(
         selectedNumBedrooms,
@@ -91,6 +153,12 @@ export default function PredictForm({ navigation, price, setPrice }) {
     setPrice(price);
     console.log("price is: ", price);
   };
+
+  useEffect(() => {
+    if (Object.keys(errors).length === 0 && requestedSubmit) {
+      submitRequest();
+    }
+  }, [errors]);
 
   // TODO: could be changed to a reducer
   const addArrayItemsToState = (
@@ -146,6 +214,7 @@ export default function PredictForm({ navigation, price, setPrice }) {
         style={styles}
         useNativeAndroidPickerStyle={false}
       />
+      {errors.bedrooms && <Text style={styles.error}> {errors.bedrooms} </Text>}
 
       <View style={{ paddingVertical: 10 }} />
 
@@ -153,11 +222,14 @@ export default function PredictForm({ navigation, price, setPrice }) {
       <RNPickerSelect
         onValueChange={(value) => setSelectedNumBathrooms(value)}
         items={numOfBathrooms}
-        placeholder={{ label: "Select number of bathrooms" }}
+        placeholder={{ label: "Select number of bathrooms", value: null }}
         style={styles}
         useNativeAndroidPickerStyle={false}
       />
 
+      {errors.bathrooms && (
+        <Text style={styles.error}> {errors.bathrooms} </Text>
+      )}
       <View style={{ paddingVertical: 10 }} />
 
       <Text> listing type: </Text>
@@ -171,6 +243,9 @@ export default function PredictForm({ navigation, price, setPrice }) {
         // value={selectedListingType}
       />
 
+      {errors.listingType && (
+        <Text style={styles.error}> {errors.listingType} </Text>
+      )}
       <View style={{ paddingVertical: 10 }} />
 
       <Text> Area (sqft): </Text>
@@ -181,6 +256,7 @@ export default function PredictForm({ navigation, price, setPrice }) {
         keyboardType="numeric"
       />
 
+      {errors.area && <Text style={styles.error}> {errors.area} </Text>}
       <View style={{ paddingVertical: 10 }} />
 
       <Text> Location: </Text>
@@ -193,9 +269,11 @@ export default function PredictForm({ navigation, price, setPrice }) {
         useNativeAndroidPickerStyle={false}
       />
 
+      {errors.location && <Text style={styles.error}> {errors.location} </Text>}
       <View style={{ paddingVertical: 10 }} />
 
       <Text> Description</Text>
+
       <TextInput
         style={styles.multilineTextInput}
         multiline
@@ -203,6 +281,9 @@ export default function PredictForm({ navigation, price, setPrice }) {
         onChangeText={setDescription}
         value={description}
       />
+      {errors.description && (
+        <Text style={styles.error}> {errors.description} </Text>
+      )}
       <StatusBar style="auto" />
 
       <View style={{ paddingVertical: 10 }} />
@@ -215,6 +296,9 @@ export default function PredictForm({ navigation, price, setPrice }) {
 const styles = StyleSheet.create({
   containerMargin: { backgroundColor: "white", padding: 20 },
 
+  error: {
+    color: "red",
+  },
   container: {
     flex: 1,
     flexDirection: "column",
@@ -224,7 +308,7 @@ const styles = StyleSheet.create({
 
   inputIOS: {
     fontSize: 16,
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 10,
     borderWidth: 0.5,
     borderColor: "gray",
