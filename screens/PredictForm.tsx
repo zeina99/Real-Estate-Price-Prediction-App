@@ -13,7 +13,7 @@ import {
 import RNPickerSelect from "react-native-picker-select";
 import { fetchPrice } from "../api/price";
 import { fetchText } from "../api/text";
-import { convertArraytoArrayOfObjects } from "../utils/arrays";
+import { convertArraytoArrayOfObjects, roundNumber } from "../utils/arrays";
 
 // import * as FileSystem from "expo-file-system";
 const numOfBedrooms = [
@@ -75,7 +75,7 @@ export default function PredictForm({ navigation, price, setPrice }) {
       );
     } catch (error) {
       console.log(error);
-      console.log(
+      console.error(
         selectedNumBedrooms,
         selectedNumBathrooms,
         selectedListingType,
@@ -87,6 +87,7 @@ export default function PredictForm({ navigation, price, setPrice }) {
 
     navigation.navigate("Result");
 
+    price = roundNumber(price);
     setPrice(price);
     console.log("price is: ", price);
   };
@@ -109,34 +110,26 @@ export default function PredictForm({ navigation, price, setPrice }) {
     }
   };
 
-  // useeffect(() => {
-  //   const listing_type_textarray = fetchtext(text_files.listing_type);
-  //   listing_type_textarray.then((listing_type_textarray) => {
-  //     addarrayitemstostate(listing_type_textarray, "listingtype");
-  //   });
-
-  //   const location_textarray = fetchtext(text_files.location);
-  //   location_textarray.then((location_textarray) =>
-  //     addarrayitemstostate(location_textarray, "location")
-  //   );
-  // }, []);
   useEffect(() => {
-    const listing_type_textArray = fetchText(text_files.listing_type);
+    if (location !== null) {
+      const listing_type_textArray = fetchText(text_files.listing_type);
 
-    listing_type_textArray.then((listing_type_textArray) => {
-      let listing_typeArrayOfObjects = convertArraytoArrayOfObjects(
-        listing_type_textArray
-      );
-      addArrayItemsToState(listing_typeArrayOfObjects, "listingType");
-    });
+      listing_type_textArray.then((listing_type_textArray) => {
+        let listing_typeArrayOfObjects = convertArraytoArrayOfObjects(
+          listing_type_textArray
+        );
+        addArrayItemsToState(listing_typeArrayOfObjects, "listingType");
+      });
+    }
+    if (listingType !== null) {
+      const location_textArray = fetchText(text_files.location);
 
-    const location_textArray = fetchText(text_files.location);
-
-    location_textArray.then((location_textArray) => {
-      let locationArrayOfObjects =
-        convertArraytoArrayOfObjects(location_textArray);
-      addArrayItemsToState(locationArrayOfObjects, "location");
-    });
+      location_textArray.then((location_textArray) => {
+        let locationArrayOfObjects =
+          convertArraytoArrayOfObjects(location_textArray);
+        addArrayItemsToState(locationArrayOfObjects, "location");
+      });
+    }
   }, []);
 
   return (
@@ -150,8 +143,8 @@ export default function PredictForm({ navigation, price, setPrice }) {
         items={numOfBedrooms}
         onValueChange={(value, index) => setSelectedNumBedrooms(value)}
         placeholder={{ label: "Select number of bedrooms", value: null }}
-        useNativeAndroidPickerStyle={true}
         style={styles}
+        useNativeAndroidPickerStyle={false}
       />
 
       <View style={{ paddingVertical: 10 }} />
@@ -162,6 +155,7 @@ export default function PredictForm({ navigation, price, setPrice }) {
         items={numOfBathrooms}
         placeholder={{ label: "Select number of bathrooms" }}
         style={styles}
+        useNativeAndroidPickerStyle={false}
       />
 
       <View style={{ paddingVertical: 10 }} />
@@ -173,6 +167,8 @@ export default function PredictForm({ navigation, price, setPrice }) {
         items={listingType}
         placeholder={{ label: "Select listing type ", value: null }}
         style={styles}
+        useNativeAndroidPickerStyle={false}
+        // value={selectedListingType}
       />
 
       <View style={{ paddingVertical: 10 }} />
@@ -194,6 +190,7 @@ export default function PredictForm({ navigation, price, setPrice }) {
         items={location}
         placeholder={{ label: "Select Location: ", value: null }}
         style={styles}
+        useNativeAndroidPickerStyle={false}
       />
 
       <View style={{ paddingVertical: 10 }} />
@@ -202,11 +199,13 @@ export default function PredictForm({ navigation, price, setPrice }) {
       <TextInput
         style={styles.multilineTextInput}
         multiline
-        numberOfLines={16}
+        numberOfLines={6}
         onChangeText={setDescription}
         value={description}
       />
       <StatusBar style="auto" />
+
+      <View style={{ paddingVertical: 10 }} />
 
       <Button title="Submit" onPress={handleSubmit} />
     </ScrollView>
@@ -214,12 +213,11 @@ export default function PredictForm({ navigation, price, setPrice }) {
 }
 
 const styles = StyleSheet.create({
-  containerMargin: { marginTop: 50 },
+  containerMargin: { backgroundColor: "white", padding: 20 },
 
   container: {
     flex: 1,
     flexDirection: "column",
-    // backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -228,23 +226,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingVertical: 12,
     paddingHorizontal: 10,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: "gray",
-    borderRadius: 4,
+    borderRadius: 8,
     color: "black",
     paddingRight: 30, // to ensure the text is never behind the icon
   },
-
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: "grey",
+    borderRadius: 8,
+    color: "black",
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
   textinput: {
     height: 40,
-    backgroundColor: "#ededed",
+    backgroundColor: "#f5f5f5",
     width: 100,
     padding: 10,
+    borderRadius: 10,
+    borderStyle: "solid",
+    borderColor: "black",
   },
 
   multilineTextInput: {
+    borderRadius: 10,
+    borderStyle: "solid",
+    borderColor: "black",
     padding: 15,
-    backgroundColor: "#ededed",
+    backgroundColor: "#f5f5f5",
   },
 
   picker: {

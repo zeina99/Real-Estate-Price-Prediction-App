@@ -5,3 +5,7 @@ export const convertArraytoArrayOfObjects = (array: string[]) => {
 
   return arrayOfObjects;
 };
+
+export const roundNumber = (number: number) => {
+  return Math.round(number * 100) / 100;
+};
