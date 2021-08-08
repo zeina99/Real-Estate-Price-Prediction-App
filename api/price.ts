@@ -1,4 +1,4 @@
-const SERVER_URL = "http://127.0.0.1:5000/";
+const SERVER_URL = "https://aqueous-atoll-22403.herokuapp.com/";
 
 export const fetchPrice = async (
   selectedNumBedrooms: string,
