@@ -45,6 +45,7 @@ Umm Hurair
 Dubai Residence Complex
 The Springs
 Arabian Ranches 2
+Al Safa
 Al Jaddaf
 Bur Dubai
 Umm Suqeim
@@ -80,10 +81,3 @@ Al Warqa'a
 World Trade Center
 Al Khail Heights
 Downtown Jebel Ali
-Al Khan
-Al Taawun
-Muwaileh Commercial
-Sharjah
-Al Majaz
-Muwaileh
-Al Qasemiya
