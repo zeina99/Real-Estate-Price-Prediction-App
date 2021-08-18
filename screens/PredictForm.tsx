@@ -8,6 +8,8 @@ import {
   View,
   Button,
   ScrollView,
+  Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 
 import RNPickerSelect from "react-native-picker-select";
@@ -200,102 +202,132 @@ export default function PredictForm({ navigation, price, setPrice }) {
     }
   }, []);
 
-  return (
-    <ScrollView
-      style={styles.containerMargin}
-      // contentContainerStyle={styles.container}
-    >
-      <Text>Number of bedrooms: </Text>
+  const renderScreen = () => {
+    return (
+      <ScrollView
+        style={styles.containerMargin}
+        // contentContainerStyle={styles.container}
+      >
+        <Text style={styles.header}>Predict..</Text>
+        <Text>Number of bedrooms: </Text>
 
-      <RNPickerSelect
-        items={numOfBedrooms}
-        onValueChange={(value, index) => setSelectedNumBedrooms(value)}
-        placeholder={{ label: "Select number of bedrooms", value: null }}
-        style={styles}
-        useNativeAndroidPickerStyle={false}
-      />
-      {errors.bedrooms && <Text style={styles.error}> {errors.bedrooms} </Text>}
+        <RNPickerSelect
+          items={numOfBedrooms}
+          onValueChange={(value, index) => setSelectedNumBedrooms(value)}
+          placeholder={{ label: "Select number of bedrooms", value: null }}
+          style={styles}
+          useNativeAndroidPickerStyle={false}
+        />
+        {errors.bedrooms && (
+          <Text style={styles.error}> {errors.bedrooms} </Text>
+        )}
 
-      <View style={{ paddingVertical: 10 }} />
+        <View style={{ paddingVertical: 10 }} />
 
-      <Text>Number of bathrooms: </Text>
-      <RNPickerSelect
-        onValueChange={(value) => setSelectedNumBathrooms(value)}
-        items={numOfBathrooms}
-        placeholder={{ label: "Select number of bathrooms", value: null }}
-        style={styles}
-        useNativeAndroidPickerStyle={false}
-      />
+        <Text>Number of bathrooms: </Text>
+        <RNPickerSelect
+          onValueChange={(value) => setSelectedNumBathrooms(value)}
+          items={numOfBathrooms}
+          placeholder={{ label: "Select number of bathrooms", value: null }}
+          style={styles}
+          useNativeAndroidPickerStyle={false}
+        />
 
-      {errors.bathrooms && (
-        <Text style={styles.error}> {errors.bathrooms} </Text>
-      )}
-      <View style={{ paddingVertical: 10 }} />
+        {errors.bathrooms && (
+          <Text style={styles.error}> {errors.bathrooms} </Text>
+        )}
+        <View style={{ paddingVertical: 10 }} />
 
-      <Text> listing type: </Text>
+        <Text> listing type: </Text>
 
-      <RNPickerSelect
-        onValueChange={(value, index) => setSelectedListingType(value)}
-        items={listingType}
-        placeholder={{ label: "Select listing type ", value: null }}
-        style={styles}
-        useNativeAndroidPickerStyle={false}
-        // value={selectedListingType}
-      />
+        <RNPickerSelect
+          onValueChange={(value, index) => setSelectedListingType(value)}
+          items={listingType}
+          placeholder={{ label: "Select listing type ", value: null }}
+          style={styles}
+          useNativeAndroidPickerStyle={false}
+          // value={selectedListingType}
+        />
 
-      {errors.listingType && (
-        <Text style={styles.error}> {errors.listingType} </Text>
-      )}
-      <View style={{ paddingVertical: 10 }} />
+        {errors.listingType && (
+          <Text style={styles.error}> {errors.listingType} </Text>
+        )}
+        <View style={{ paddingVertical: 10 }} />
 
-      <Text> Area (sqft): </Text>
-      <TextInput
-        style={styles.textinput}
-        onChangeText={onChangeArea}
-        value={area}
-        keyboardType="numeric"
-      />
+        <Text> Area (sqft): </Text>
+        <TextInput
+          style={styles.textinput}
+          onChangeText={onChangeArea}
+          value={area}
+          keyboardType="numeric"
+        />
 
-      {errors.area && <Text style={styles.error}> {errors.area} </Text>}
-      <View style={{ paddingVertical: 10 }} />
+        {errors.area && <Text style={styles.error}> {errors.area} </Text>}
 
-      <Text> Location: </Text>
+        <View style={{ paddingVertical: 10 }} />
 
-      <RNPickerSelect
-        onValueChange={(value, index) => setSelectedLocation(value)}
-        items={location}
-        placeholder={{ label: "Select Location: ", value: null }}
-        style={styles}
-        useNativeAndroidPickerStyle={false}
-      />
+        <Text> Location: </Text>
 
-      {errors.location && <Text style={styles.error}> {errors.location} </Text>}
-      <View style={{ paddingVertical: 10 }} />
+        <RNPickerSelect
+          onValueChange={(value, index) => setSelectedLocation(value)}
+          items={location}
+          placeholder={{ label: "Select Location: ", value: null }}
+          style={styles}
+          useNativeAndroidPickerStyle={false}
+        />
 
-      <Text> Description</Text>
+        {errors.location && (
+          <Text style={styles.error}> {errors.location} </Text>
+        )}
+        <View style={{ paddingVertical: 10 }} />
 
-      <TextInput
-        style={styles.multilineTextInput}
-        multiline
-        numberOfLines={6}
-        onChangeText={setDescription}
-        value={description}
-      />
-      {errors.description && (
-        <Text style={styles.error}> {errors.description} </Text>
-      )}
-      <StatusBar style="auto" />
+        <Text> Description</Text>
 
-      <View style={{ paddingVertical: 10 }} />
+        <TextInput
+          style={styles.multilineTextInput}
+          multiline
+          numberOfLines={6}
+          onChangeText={setDescription}
+          value={description}
+        />
+        {errors.description && (
+          <Text style={styles.error}> {errors.description} </Text>
+        )}
+        <StatusBar style="auto" />
 
-      <Button title="Submit" onPress={handleSubmit} />
-    </ScrollView>
-  );
+        <View style={{ paddingVertical: 10 }} />
+
+        <Button title="Submit" onPress={handleSubmit} />
+      </ScrollView>
+    );
+  };
+
+  const renderDecision = () => {
+    if (Platform.OS === "android") {
+      return renderScreen();
+    } else {
+      return (
+        <KeyboardAvoidingView
+          keyboardVerticalOffset={Platform.select({ ios: 60, android: 50 })}
+          style={{ backgroundColor: "white", flex: 1 }}
+          behavior="padding"
+        >
+          {renderScreen()}
+        </KeyboardAvoidingView>
+      );
+    }
+  };
+  return renderDecision();
 }
 
 const styles = StyleSheet.create({
   containerMargin: { backgroundColor: "white", padding: 20 },
 
+  header: {
+    fontSize: 36,
+    marginBottom: 20,
+    marginTop: 30,
+  },
   error: {
     color: "red",
   },

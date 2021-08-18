@@ -16,7 +16,10 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="PredictForm">
-        <Stack.Screen name="PredictForm">
+        <Stack.Screen
+          name="PredictForm"
+          options={{ title: "Predict", headerShown: false }}
+        >
           {(props) => (
             <PredictForm {...props} price={price} setPrice={setPrice} />
           )}
