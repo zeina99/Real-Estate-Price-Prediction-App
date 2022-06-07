@@ -12,4 +12,5 @@ App backend: https://github.com/zeina99/Real-Estate-Price-Prediction-server
 ![Main Screen](screenshots/mainscreen.png)
 
 - Once the predicted price is recieved as a response, it gets displayed on the screen.
+
 ![Result Screen](screenshots/resultscreen.png)
